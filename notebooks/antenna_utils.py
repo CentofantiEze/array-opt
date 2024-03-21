@@ -57,15 +57,18 @@ def get_uv_mask(uv_plane):
 def get_beam(uv_mask):
     return np.abs(np.fft.ifft2(uv_mask))
 
-def plot_beam(beam, pRng = (-0.1, 0.5)):
+def plot_beam(beam, pRng = (-0.1, 0.5), ax=None, fig=None):
     zMin = np.nanmin(beam)
     zMax = np.nanmax(beam)
     zRng = zMin - zMax
     zMin -= zRng * pRng[0]
     zMax += zRng * pRng[1]
-    plt.imshow(np.fft.ifftshift(beam), vmin=zMin, vmax=zMax)
-    plt.colorbar()
-    plt.show()
+    if ax==None or fig==None:
+        fig, ax = plt.subplots(1,1)
+    im = ax.imshow(np.fft.ifftshift(beam), vmin=zMin, vmax=zMax)
+    fig.colorbar(im, ax=ax)
+    if ax==None or fig==None:
+        plt.show()
 
 def plot_antenna_arr(array):
     fig = plt.figure(figsize=(5, 5))
@@ -116,5 +119,5 @@ def plot_sampled_sky(sky_uv):
     plt.colorbar()
     plt.show()
 
-def get_obs_sky(obs_uv):
-    return np.fft.ifft2(np.fft.ifftshift(obs_uv))
+def get_obs_sky(obs_uv, abs=False):
+    return np.abs(np.fft.ifft2(np.fft.ifftshift(obs_uv))) if abs else np.fft.ifft2(np.fft.ifftshift(obs_uv))
