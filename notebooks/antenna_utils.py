@@ -63,68 +63,14 @@ def get_uv_mask(uv_plane):
 def get_beam(uv_mask):
     return np.abs(np.fft.ifft2(uv_mask))
 
-def plot_beam(beam, pRng = (-0.1, 0.5), ax=None, fig=None):
-    # Imshow min and max values.
-    zMin = np.nanmin(beam)
-    zMax = np.nanmax(beam)
-    zRng = zMin - zMax
-    zMin -= zRng * pRng[0]
-    zMax += zRng * pRng[1]
-    if ax==None or fig==None:
-        fig, ax = plt.subplots(1,1)
-    im = ax.imshow(np.fft.ifftshift(beam), vmin=zMin, vmax=zMax)
-    fig.colorbar(im, ax=ax)
-    if ax==None or fig==None:
-        plt.show()
-
-def plot_antenna_arr(array):
-    fig = plt.figure(figsize=(5, 5))
-    plt.scatter(array[:,0], array[:,1],s=20, c='gray')
-    for i, txt in enumerate(range(1,len(array)+1,1)):
-        plt.annotate(txt, (array[i,0], array[i,1]))
-        plt.xlabel('x [m]')
-        plt.ylabel('y [m]')
-        x_lim=max(abs(array[:,0]))*1.1
-        y_lim=max(abs(array[:,1]))*1.1
-        plt.xlim(-x_lim, x_lim)
-        plt.ylim(-y_lim, y_lim)
-    plt.show()
-
-def plot_uv_plane(visibilities, n_baselines=None):
-    fig = plt.figure(figsize=(5, 5))
-    plt.scatter(visibilities[:,0], visibilities[:,1],s=0.4, c='gray')
-    if n_baselines is not None:
-        delta = int(visibilities.shape[0]/2)
-        plt.scatter(visibilities[delta:delta+n_baselines,0], visibilities[delta:delta+n_baselines,1], s=2,c='k')
-    plt.xlabel(r'u x $\lambda$ [m]')
-    plt.ylabel(r'v x $\lambda$ [m]')
-    plt.xlim([np.min(visibilities), np.max(visibilities)])
-    plt.ylim([np.min(visibilities), np.max(visibilities)])
-    plt.show()
-
 def load_sky_model(path):
     return np.array(Image.open(path).convert("L"))
-
-def plot_sky(image):
-    plt.imshow(image)
-    plt.show()
-    print('Image shape:', image.shape)
-    print('Image range: ({},{})'.format(np.min(image), np.max(image)))
 
 def get_sky_uv(sky):
     return np.fft.fft2(sky)
 
-def plot_sky_uv(sky_uv):
-    plt.imshow(np.abs(np.fft.fftshift(sky_uv)), norm=matplotlib.colors.LogNorm())
-    plt.show()
-
 def get_obs_uv(sky_uv, mask):
     return np.fft.fftshift(sky_uv).copy()*mask
-
-def plot_sampled_sky(sky_uv):
-    plt.imshow(np.abs(sky_uv)+1e-3, norm=matplotlib.colors.LogNorm())
-    plt.colorbar()
-    plt.show()
 
 def get_obs_sky(obs_uv, abs=False):
     return np.abs(np.fft.ifft2(np.fft.ifftshift(obs_uv))) if abs else np.fft.ifft2(np.fft.ifftshift(obs_uv))
